@@ -50,7 +50,13 @@ class Board {
         private set(value) {
             field = value
         }
-    private val fields = mutableMapOf<Field, Piece?>()
+    var checked: Player? = null
+        get() = field
+        private set(value) {
+            field = value
+        }
+
+    private var fields = mutableMapOf<Field, Piece?>()
 
     init {
         for (y in Core.range())
@@ -76,8 +82,10 @@ class Board {
 
     sealed class MoveResult {
         class ValidMove(val attacked: Piece?, val checked: Player?) : MoveResult()
-        object IllegalMove : Board.MoveResult()
+        object StillInCheck : MoveResult()
 
+        object IllegalMove : Board.MoveResult()
+        object OutOfTurn : MoveResult()
         object OutOfBounds : MoveResult()
         object EmptySpace : MoveResult()
     }
@@ -87,6 +95,11 @@ class Board {
         if (!fields.containsKey(fromField)) return MoveResult.OutOfBounds
 
         val moving = fields[fromField] ?: return MoveResult.EmptySpace
+
+        if (moving.player != player) {
+            return MoveResult.OutOfTurn
+        }
+
         val movesAllowed = moving.moves(fromField, this)
         val movedTo = fields[toField]
         if (!movesAllowed.contains(toField)) {
@@ -100,13 +113,38 @@ class Board {
                 MoveResult.ValidMove(null, checked)
             }
 
-        val checked = checked(player, moving, toField)
+        val draftFields = fields.toMutableMap()
+
+        draftFields[fromField] = null
+        draftFields[toField] = moving
+
+        val stillCheck = stillCheck(draftFields)
+        if (stillCheck) {
+            return MoveResult.StillInCheck
+        }
+
+        checked = checked(player, moving, toField)
 
         val r = validMove(checked)
+
         player = player.opponent
-        fields[fromField] = null
-        fields[toField] = moving
+        fields = draftFields
+
         return r
+    }
+
+    private fun stillCheck(draftFields: MutableMap<Field, Piece?>): Boolean {
+        val playerKingPosition = draftFields
+            .entries
+            .firstOrNull { it.value == King(player) }
+            ?.key
+            ?: return false
+
+        val www = draftFields
+            .filter { it.value?.player == player.opponent }
+            .mapNotNull { it.value?.moves(it.key, this) }
+
+        return www.any { it.contains(playerKingPosition) }
     }
 
     private fun checked(attacking: Player, moving: Piece, toField: Field): Player? {
@@ -120,8 +158,31 @@ class Board {
         }
     }
 
+    fun copy(): Board {
+        val board = Board()
+        board.player = player
+        board.checked = checked
+        board.fields = fields.toMutableMap()
+        return board
+    }
+
     operator fun set(field: Field, value: Piece) {
         fields[field] = value
+    }
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other !is Board) return false
+
+        if (player != other.player) return false
+        if (checked != other.checked) return false
+        if (fields != other.fields) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        return fields.hashCode()
     }
 
     companion object {

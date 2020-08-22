@@ -1,53 +1,63 @@
 package pl.mlynik
 
+import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertSame
+import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.fail
-import org.junit.jupiter.params.ParameterizedTest
-import org.junit.jupiter.params.provider.MethodSource
 
 class CheckedTest {
 
-    @ParameterizedTest
-    @MethodSource("cases")
-    fun checked_test(case: Case) {
-        val board = case.board
-        val moves = case.moves
-        var result: Board.MoveResult? = null
-        moves.forEach {
-            result = board.move(it.from, it.to)
-        }
+    @Test
+    fun checked_test() {
+        val board = Board
+            .with(King(Player.White), Field(3, 0))
+            .with(Knight(Player.Black), Field(3, 4))
+            .with(Pawn(Player.White), Field(3, 1))
+            .build()
+
+        assertSame(Player.White, board.player)
+
+        board.move(Field(3, 1), Field(3, 2))
+
+        assertSame(Player.Black, board.player)
+
+        val result = board.move(Field(3, 4), Field(2, 2))
 
         if (result is Board.MoveResult.ValidMove) {
-            assertSame(case.checked, (result as Board.MoveResult.ValidMove).checked)
+            assertSame(Player.White, (result as Board.MoveResult.ValidMove).checked)
         } else {
-            fail("Expected Checked ${case.checked}, but found $result")
+            fail("Expected Checked ${Player.White}, but found $result")
         }
+
+        assertSame(Player.White, board.checked)
+        assertSame(board.checked, board.player)
     }
 
-    data class Case(val board: Board, val moves: List<Move>, val checked: Player)
+    @Test
+    fun disallow_move_which_keeps_check() {
+        val board = Board
+            .with(King(Player.White), Field(3, 0))
+            .with(Knight(Player.Black), Field(3, 4))
+            .with(Pawn(Player.White), Field(3, 1))
+            .build()
 
-    data class Move(val from: Field, val to: Field)
+        assertSame(Player.White, board.player)
 
-    companion object {
-        @JvmStatic
-        fun cases() = listOf(
-            Case(
-                Board
-                    .with(King(Player.White), Field(3, 0))
-                    .with(Knight(Player.Black), Field(3, 4))
-                    .with(Pawn(Player.White), Field(3, 1))
-                    .build(),
-                listOf(
-                    Move(
-                        Field(3, 1), Field(3, 2)
-                    ),
-                    Move(
-                        Field(3, 4), Field(2, 2)
-                    )
-                ),
-                Player.White
-            )
-        )
+        board.move(Field(3, 1), Field(3, 2))
+
+        assertSame(Player.Black, board.player)
+
+        board.move(Field(3, 4), Field(2, 2))
+
+        assertSame(Player.White, board.checked)
+        assertSame(board.checked, board.player)
+
+        val boardCopy = board.copy()
+        // move Pawn which will keep King Checked
+        val result = board.move(Field(3, 2), Field(3, 3))
+
+        assert(result is Board.MoveResult.StillInCheck)
+
+        assertEquals(boardCopy, board)
     }
-
 }

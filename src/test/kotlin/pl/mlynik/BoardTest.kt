@@ -41,5 +41,17 @@ class BoardTest {
         assert(moveResult is Board.MoveResult.IllegalMove)
     }
 
+    @Test
+    fun move_returns_out_of_turn() {
+        // assume White Starts
+        val pawn = Pawn(Player.Black)
+        val board = Board
+            .withFields(Field(1, 1), Field(1, 2))
+            .filledWith { pawn }
+            .build()
 
+        val moveResult = board.move(Field(1, 1), Field(1, 2))
+
+        assert(moveResult is Board.MoveResult.OutOfTurn)
+    }
 }
