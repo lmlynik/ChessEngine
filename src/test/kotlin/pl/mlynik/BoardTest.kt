@@ -16,7 +16,7 @@ class BoardTest {
     }
 
     @Test
-    fun put_returns_valid_when_put_on_empty() {
+    fun move_returns_valid_when_put_on_empty() {
         val pawn = Pawn(Player.White)
         val board = Board
             .withFields(Field(1, 1))
@@ -29,7 +29,7 @@ class BoardTest {
     }
 
     @Test
-    fun put_returns_occupied_friend_when_put_on_friend() {
+    fun move_returns_occupied_friend_when_put_on_friend() {
         val pawn = Pawn(Player.White)
         val board = Board
             .withFields(Field(1, 1), Field(1, 2))
@@ -40,4 +40,6 @@ class BoardTest {
 
         assert(moveResult is Board.MoveResult.IllegalMove)
     }
+
+
 }

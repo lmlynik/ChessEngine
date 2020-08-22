@@ -7,8 +7,13 @@ private object Core {
 }
 
 enum class Player {
-    White, Black
+    White, Black;
 }
+
+val Player.opponent: Player
+    get() {
+        return if (this == Player.Black) Player.White else Player.Black
+    }
 
 data class Field(val x: Int, val y: Int) {
 
@@ -40,8 +45,11 @@ enum class Direction {
 }
 
 class Board {
-    private var player = Player.White
+    var player = Player.White
         get() = field
+        private set(value) {
+            field = value
+        }
     private val fields = mutableMapOf<Field, Piece?>()
 
     init {
@@ -52,7 +60,7 @@ class Board {
 
     sealed class AtResult {
         object OutOfBounds : AtResult()
-        class Occupied(val piece: Piece) : AtResult()
+        data class Occupied(val piece: Piece) : AtResult()
         object Empty : AtResult()
     }
 
@@ -85,21 +93,31 @@ class Board {
             return MoveResult.IllegalMove
         }
 
-        val result =
+        fun validMove(checked: Player?) =
             if (movedTo != null && moving.player != movedTo.player) {
-                MoveResult.ValidMove(movedTo, checked())
+                MoveResult.ValidMove(movedTo, checked)
             } else {
-                MoveResult.ValidMove(null, checked())
+                MoveResult.ValidMove(null, checked)
             }
 
-        player = if (player == Player.White) Player.Black else Player.White
+        val checked = checked(player, moving, toField)
+
+        val r = validMove(checked)
+        player = player.opponent
         fields[fromField] = null
         fields[toField] = moving
-        return result
+        return r
     }
 
-    private fun checked(): Player? {
-        return null
+    private fun checked(attacking: Player, moving: Piece, toField: Field): Player? {
+        val opponent = attacking.opponent
+        val moves = moving.moves(toField, this).filter { at(it) == AtResult.Occupied(King(opponent)) }
+
+        return if (moves.isNotEmpty()) {
+            opponent
+        } else {
+            null
+        }
     }
 
     operator fun set(field: Field, value: Piece) {

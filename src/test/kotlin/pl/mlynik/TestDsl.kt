@@ -25,3 +25,23 @@ class WithFieldsBuilder(
         )
     }
 }
+
+
+fun Board.Companion.with(piece: Piece, field: Field): PieceAtFieldBuilder {
+    return PieceAtFieldBuilder(piece, field)
+}
+
+class PieceAtFieldBuilder(piece: Piece, field: Field, private var board: Board = Board.empty()) {
+    init {
+        board[field] = piece
+    }
+
+    fun with(piece: Piece, field: Field): PieceAtFieldBuilder {
+        return PieceAtFieldBuilder(piece, field, board)
+    }
+
+    fun build(): Board {
+        return board
+    }
+
+}

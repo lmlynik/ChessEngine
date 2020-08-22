@@ -1,6 +1,6 @@
 package pl.mlynik
 
-abstract class Piece(val player: Player) {
+abstract class Piece(val player: Player, val symbol: Char) {
 
     abstract fun moves(field: Field, board: Board): Set<Field>
 
@@ -15,9 +15,25 @@ abstract class Piece(val player: Player) {
             false
         }
     }
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other !is Piece) return false
+
+        if (player != other.player) return false
+        if (symbol != other.symbol) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        var result = player.hashCode()
+        result = 31 * result + symbol.hashCode()
+        return result
+    }
 }
 
-class Pawn(player: Player) : Piece(player) {
+class Pawn(player: Player) : Piece(player, 'p') {
 
     override fun moves(field: Field, board: Board): Set<Field> {
         val list = mutableSetOf<Field>()
@@ -43,21 +59,21 @@ class Pawn(player: Player) : Piece(player) {
     }
 }
 
-class Rook(player: Player) : Piece(player) {
+class Rook(player: Player) : Piece(player, 'r') {
 
     override fun moves(field: Field, board: Board): Set<Field> {
         return setOf()
     }
 }
 
-class Bishop(player: Player) : Piece(player) {
+class Bishop(player: Player) : Piece(player, 'b') {
 
     override fun moves(field: Field, board: Board): Set<Field> {
         return setOf()
     }
 }
 
-class Knight(player: Player) : Piece(player) {
+class Knight(player: Player) : Piece(player, 'n') {
 
     override fun moves(field: Field, board: Board): Set<Field> {
         return listOf(
@@ -81,7 +97,7 @@ class Knight(player: Player) : Piece(player) {
     }
 }
 
-class King(player: Player) : Piece(player) {
+class King(player: Player) : Piece(player, 'k') {
 
     override fun moves(field: Field, board: Board): Set<Field> {
         return listOf(
@@ -102,7 +118,7 @@ class King(player: Player) : Piece(player) {
     }
 }
 
-class Queen(player: Player) : Piece(player) {
+class Queen(player: Player) : Piece(player, 'q') {
 
     override fun moves(field: Field, board: Board): Set<Field> {
         return setOf()
