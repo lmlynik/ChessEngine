@@ -1,6 +1,5 @@
 package pl.mlynik
 
-
 private object Core {
     fun range(): IntRange {
         return 0..7
@@ -39,7 +38,6 @@ enum class Rank {
 enum class Direction {
     Left, Right
 }
-
 
 class Board {
     private var player = Player.White

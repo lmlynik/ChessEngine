@@ -1,6 +1,5 @@
 package pl.mlynik
 
-
 fun Board.Companion.withFields(vararg fields: Field): WithFieldsBuilder {
     return WithFieldsBuilder(fields)
 }

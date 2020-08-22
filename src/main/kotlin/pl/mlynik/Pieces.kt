@@ -1,6 +1,5 @@
 package pl.mlynik
 
-
 abstract class Piece(val player: Player) {
 
     abstract fun moves(field: Field, board: Board): Set<Field>
