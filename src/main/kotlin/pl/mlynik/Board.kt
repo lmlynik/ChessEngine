@@ -58,20 +58,13 @@ class Board {
 
     private var fields = mutableMapOf<Field, Piece?>()
 
-    init {
-        for (y in Core.range())
-            for (x in Core.range())
-                fields[Field(x, y)] = null
-    }
-
     sealed class AtResult {
-        object OutOfBounds : AtResult()
         data class Occupied(val piece: Piece) : AtResult()
         object Empty : AtResult()
     }
 
     fun at(field: Field): AtResult {
-        if (!fields.containsKey(field)) return AtResult.OutOfBounds
+        fields[field] ?: return AtResult.Empty
 
         val piece = fields[field]
         return if (piece == null)
@@ -91,8 +84,8 @@ class Board {
     }
 
     fun move(fromField: Field, toField: Field): MoveResult {
-        if (!fields.containsKey(toField)) return MoveResult.OutOfBounds
-        if (!fields.containsKey(fromField)) return MoveResult.OutOfBounds
+        if (!toField.isValid()) return MoveResult.OutOfBounds
+        if (!fromField.isValid()) return MoveResult.OutOfBounds
 
         val moving = fields[fromField] ?: return MoveResult.EmptySpace
 
@@ -166,8 +159,10 @@ class Board {
         return board
     }
 
-    operator fun set(field: Field, value: Piece) {
-        fields[field] = value
+    fun with(field: Field, value: Piece): Board {
+        val board = copy()
+        board.fields[field] = value
+        return board
     }
 
     override fun equals(other: Any?): Boolean {
@@ -188,6 +183,12 @@ class Board {
     companion object {
         fun empty(): Board {
             return Board()
+        }
+
+        fun with(field: Field, value: Piece): Board {
+            val board = Board()
+            board.fields[field] = value
+            return board
         }
     }
 }

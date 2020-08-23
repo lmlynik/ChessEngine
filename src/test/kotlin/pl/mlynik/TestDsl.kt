@@ -10,7 +10,7 @@ class WithFieldsBuilder(
 ) {
 
     fun filledWith(piece: () -> Piece): WithFieldsBuilder {
-        fields.forEach { board[it] = piece() }
+        fields.forEach { board = board.with(it, piece()) }
         return this
     }
 
@@ -39,7 +39,7 @@ fun Board.Companion.with(piece: Piece, field: Field): PieceAtFieldBuilder {
 
 class PieceAtFieldBuilder(piece: Piece, field: Field, private var board: Board = Board.empty()) {
     init {
-        board[field] = piece
+        board = board.with(field, piece)
     }
 
     fun with(piece: Piece, field: Field): PieceAtFieldBuilder {
