@@ -1,10 +1,12 @@
 plugins {
+    id 'java-library'
     id 'org.jetbrains.kotlin.jvm' version '1.4.0'
+    id 'maven-publish'
 }
 
 ext.junitVersion = "5.3.2"
 
-group 'org.example'
+group 'pl.mlynik'
 version '1.0-SNAPSHOT'
 
 repositories {
@@ -55,4 +57,22 @@ task ktlintFormat(type: JavaExec, group: "formatting") {
     classpath = configurations.ktlint
     main = "com.pinterest.ktlint.Main"
     args "-F", "src/**/*.kt"
+}
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            from components.java
+        }
+    }
+    repositories {
+        maven {
+            name = "GitHubPackages"
+            url = "https://maven.pkg.github.com/lmlynik/ChessEngine"
+            credentials {
+                username = System.getenv("GITHUB_ACTOR")
+                password = System.getenv("GITHUB_TOKEN")
+            }
+        }
+    }
 }
