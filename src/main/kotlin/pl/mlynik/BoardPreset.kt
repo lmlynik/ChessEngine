@@ -1,6 +1,8 @@
 package pl.mlynik
 
 object BoardPreset {
+
+    @JvmStatic
     fun default(): Board {
 
         var board = Board.empty()
