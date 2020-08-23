@@ -7,12 +7,12 @@ class RookTest {
 
     @Test
     fun move_from_start() {
+        val rook = Rook(Player.White)
+
         val board = Board
             .withFields(Field(0, 0))
-            .filledWith { Rook(Player.White) }
+            .filledWith { rook }
             .build()
-
-        val rook = Rook(Player.White)
 
         assertEquals(
             setOf(
@@ -88,16 +88,15 @@ class RookTest {
 
     @Test
     fun move_blocked_by_enemy() {
+        val rook = Rook(Player.White)
         val board = Board
             .withFields(Field(0, 0))
-            .filledWith { Rook(Player.White) }
+            .filledWith { rook }
             .withFields(Field(0, 2))
             .filledWith { Pawn(Player.Black) }
             .withFields(Field(3, 0))
             .filledWith { King(Player.White) }
             .build()
-
-        val rook = Rook(Player.White)
 
         assertEquals(
             setOf(

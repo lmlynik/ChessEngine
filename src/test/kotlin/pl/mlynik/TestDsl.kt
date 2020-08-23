@@ -24,6 +24,13 @@ class WithFieldsBuilder(
             board
         )
     }
+
+    fun withFields(fields: Set<Field>): WithFieldsBuilder {
+        return WithFieldsBuilder(
+            fields.toTypedArray(),
+            board
+        )
+    }
 }
 
 fun Board.Companion.with(piece: Piece, field: Field): PieceAtFieldBuilder {

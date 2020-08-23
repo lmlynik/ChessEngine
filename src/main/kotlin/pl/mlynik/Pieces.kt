@@ -70,38 +70,25 @@ private fun Board.AtResult.occupiedBy(player: Player): Boolean {
 class Rook(player: Player) : Piece(player, 'r') {
 
     override fun moves(field: Field, board: Board): Set<Field> {
-        fun scan(f: (field: Field) -> Field): List<Field> {
-            fun scanAcc(fieldD: Field, acc: List<Field>): List<Field> {
-                val df = f(fieldD)
-                val at = board.at(df)
-                return if (!df.isValid()) {
-                    acc
-                } else if (at.occupiedBy(player)) {
-                    acc
-                } else if (at.occupiedBy(player.opponent)) {
-                    acc + df
-                } else {
-                    scanAcc(df, acc + df)
-                }
-            }
-
-            return scanAcc(field, listOf())
-        }
-
-        return (
-                scan { it + Rank.Up }
-                        + scan { it + Rank.Down }
-                        + scan { it + Direction.Left }
-                        + scan { it + Direction.Right }
-                ).toSet()
+        return scan(
+            player, field, board,
+            { it + Rank.Up },
+            { it + Rank.Down },
+            { it + Direction.Left },
+            { it + Direction.Right }
+        )
     }
 }
 
 class Bishop(player: Player) : Piece(player, 'b') {
 
     override fun moves(field: Field, board: Board): Set<Field> {
-        return setOf(
-
+        return scan(
+            player, field, board,
+            { it + Rank.Up + Direction.Left },
+            { it + Rank.Up + Direction.Right },
+            { it + Rank.Down + Direction.Left },
+            { it + Rank.Down + Direction.Right }
         )
     }
 }
@@ -154,6 +141,47 @@ class King(player: Player) : Piece(player, 'k') {
 class Queen(player: Player) : Piece(player, 'q') {
 
     override fun moves(field: Field, board: Board): Set<Field> {
-        return setOf()
+        return scan(
+            player, field, board,
+            { it + Rank.Up },
+            { it + Rank.Down },
+            { it + Direction.Left },
+            { it + Direction.Right },
+
+            { it + Rank.Up + Direction.Left },
+            { it + Rank.Up + Direction.Right },
+            { it + Rank.Down + Direction.Left },
+            { it + Rank.Down + Direction.Right }
+        )
     }
+}
+
+private fun scan(
+    player: Player,
+    field: Field,
+    board: Board,
+    vararg param: (f: Field) -> Field
+): Set<Field> {
+    fun scan(f: (field: Field) -> Field): Set<Field> {
+        fun scanAcc(fieldD: Field, acc: Set<Field>): Set<Field> {
+            val df = f(fieldD)
+            if(fieldD == df){
+                throw Exception("Field scan not progressed, stopping!!!")
+            }
+            val at = board.at(df)
+            return if (!df.isValid()) {
+                acc
+            } else if (at.occupiedBy(player)) {
+                acc
+            } else if (at.occupiedBy(player.opponent)) {
+                acc + df
+            } else {
+                scanAcc(df, acc + df)
+            }
+        }
+
+        return scanAcc(field, setOf())
+    }
+
+    return param.flatMap { scan(it) }.toSet()
 }
