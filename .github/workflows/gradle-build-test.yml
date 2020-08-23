@@ -19,7 +19,7 @@ jobs:
       - name: Publish
         uses: eskatos/gradle-command-action@v1
         with:
-          arguments: bintrayUpliad
+          arguments: bintrayUpload
         env:
           BINTRAY_USER: ${{ secrets.BINTRAY_USER }}
           BINTRAY_SECRET: ${{ secrets.BINTRAY_SECRET }}
