@@ -8,13 +8,13 @@ abstract class Piece(val player: Player, val symbol: Char) {
         return "${this.player}${this.javaClass.simpleName}"
     }
 
-    fun occupiedByFriend(at: Board.AtResult): Boolean {
-        return if (at is Board.AtResult.Occupied) {
-            at.piece.player == player
-        } else {
-            false
-        }
-    }
+//    fun occupiedBy(at: Board.AtResult, p: Player = player): Boolean {
+//        return if (at is Board.AtResult.Occupied) {
+//            at.piece.player == p
+//        } else {
+//            false
+//        }
+//    }
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
@@ -48,7 +48,7 @@ class Pawn(player: Player) : Piece(player, 'p') {
 
         fun directed(direction: Direction) {
             val r = board.at(upwards + direction)
-            if (r is Board.AtResult.Occupied && !occupiedByFriend(r)) {
+            if (r.occupiedBy(player.opponent)) {
                 list.add(upwards + direction)
             }
         }
@@ -59,24 +59,57 @@ class Pawn(player: Player) : Piece(player, 'p') {
     }
 }
 
+private fun Board.AtResult.occupiedBy(player: Player): Boolean {
+    return if (this is Board.AtResult.Occupied) {
+        this.piece.player == player
+    } else {
+        false
+    }
+}
+
 class Rook(player: Player) : Piece(player, 'r') {
 
     override fun moves(field: Field, board: Board): Set<Field> {
-        return setOf()
+        fun scan(f: (field: Field) -> Field): List<Field> {
+            fun scanAcc(fieldD: Field, acc: List<Field>): List<Field> {
+                val df = f(fieldD)
+                val at = board.at(df)
+                return if (!df.isValid()) {
+                    acc
+                } else if (at.occupiedBy(player)) {
+                    acc
+                } else if (at.occupiedBy(player.opponent)) {
+                    acc + df
+                } else {
+                    scanAcc(df, acc + df)
+                }
+            }
+
+            return scanAcc(field, listOf())
+        }
+
+        return (
+                scan { it + Rank.Up }
+                        + scan { it + Rank.Down }
+                        + scan { it + Direction.Left }
+                        + scan { it + Direction.Right }
+                ).toSet()
     }
 }
 
 class Bishop(player: Player) : Piece(player, 'b') {
 
     override fun moves(field: Field, board: Board): Set<Field> {
-        return setOf()
+        return setOf(
+
+        )
     }
 }
 
 class Knight(player: Player) : Piece(player, 'n') {
 
     override fun moves(field: Field, board: Board): Set<Field> {
-        return listOf(
+        return setOf(
             field + Rank.Up + Rank.Up + Direction.Left,
             field + Rank.Up + Rank.Up + Direction.Right,
 
@@ -91,7 +124,7 @@ class Knight(player: Player) : Piece(player, 'n') {
         )
             .filter { it.isValid() }
             .filterNot {
-                occupiedByFriend(board.at(it))
+                board.at(it).occupiedBy(player)
             }
             .toSet()
     }
@@ -112,7 +145,7 @@ class King(player: Player) : Piece(player, 'k') {
         )
             .filter { it.isValid() }
             .filterNot {
-                occupiedByFriend(board.at(it))
+                board.at(it).occupiedBy(player)
             }
             .toSet()
     }

@@ -11,7 +11,7 @@ class KingTest {
             .withFields(Field(3, 1))
             .filledWith { Pawn(Player.White) }
             .build()
-        val knight = King(Player.White)
+        val king = King(Player.White)
 
         assertEquals(
             setOf(
@@ -20,14 +20,14 @@ class KingTest {
                 Field(2, 1),
                 Field(4, 1)
             ),
-            knight.moves(Field(3, 0), board)
+            king.moves(Field(3, 0), board)
         )
     }
 
     @Test
     fun move_from_center() {
         val board = Board.empty()
-        val knight = King(Player.White)
+        val king = King(Player.White)
 
         assertEquals(
             setOf(
@@ -40,7 +40,7 @@ class KingTest {
                 Field(2, 2),
                 Field(4, 2)
             ),
-            knight.moves(Field(3, 3), board)
+            king.moves(Field(3, 3), board)
         )
     }
 }
