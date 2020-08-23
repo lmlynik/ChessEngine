@@ -71,7 +71,9 @@ class Rook(player: Player) : Piece(player, 'r') {
 
     override fun moves(field: Field, board: Board): Set<Field> {
         return scan(
-            player, field, board,
+            player,
+            field,
+            board,
             { it + Rank.Up },
             { it + Rank.Down },
             { it + Direction.Left },
@@ -84,7 +86,9 @@ class Bishop(player: Player) : Piece(player, 'b') {
 
     override fun moves(field: Field, board: Board): Set<Field> {
         return scan(
-            player, field, board,
+            player,
+            field,
+            board,
             { it + Rank.Up + Direction.Left },
             { it + Rank.Up + Direction.Right },
             { it + Rank.Down + Direction.Left },
@@ -165,7 +169,7 @@ private fun scan(
     fun scan(f: (field: Field) -> Field): Set<Field> {
         fun scanAcc(fieldD: Field, acc: Set<Field>): Set<Field> {
             val df = f(fieldD)
-            if(fieldD == df){
+            if (fieldD == df) {
                 throw Exception("Field scan not progressed, stopping!!!")
             }
             val at = board.at(df)

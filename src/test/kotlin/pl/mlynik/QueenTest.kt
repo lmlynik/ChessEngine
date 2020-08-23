@@ -40,7 +40,6 @@ class QueenTest {
             ),
             queen.moves(Field(4, 0), board)
         )
-
     }
 
     @Test

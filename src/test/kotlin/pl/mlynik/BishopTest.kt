@@ -40,8 +40,7 @@ class BishopTest {
             .build()
 
         assertEquals(
-            setOf<Field>(
-            ),
+            setOf<Field>(),
             bishop.moves(Field(2, 0), board)
         )
     }
