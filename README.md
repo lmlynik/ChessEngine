@@ -21,3 +21,4 @@ You can find here code implementing logic for the standard chess pieces and basi
  - [ ] Castling
  - [ ] Piece Promotion
  - [ ] En passant
+ - [ ] Checkmate(just check for now)

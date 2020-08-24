@@ -6,10 +6,10 @@ import org.junit.jupiter.api.Test
 class PawnTest {
 
     @Test
-    fun white_can_go_up() {
+    fun white_can_go_up_and_2_squares_on_start() {
         val pawn = Pawn(Player.White)
         assertEquals(
-            setOf(Field(1, 2)),
+            setOf(Field(1, 2), Field(1, 3)),
             pawn.moves(Field(1, 1), Board.empty())
         )
     }
@@ -18,29 +18,26 @@ class PawnTest {
     fun black_can_go_down() {
         val pawn = Pawn(Player.Black)
         assertEquals(
-            setOf(Field(1, 0)),
-            pawn.moves(Field(1, 1), Board.empty())
+            setOf(Field(1, 4), Field(1, 5)),
+            pawn.moves(Field(1, 6), Board.empty())
         )
     }
 
     @Test
     fun white_attack_left_right() {
         val board = Board
-            .withFields(Field(2, 2))
-
+            .withFields(Field(0, 3), Field(1, 3), Field(2, 3))
             .filledWith { Pawn(Player.Black) }
-            .withFields(Field(0, 2))
-            .filledWith { Pawn(Player.White) }
+
             .build()
 
         val pawn = Pawn(Player.White)
         assertEquals(
             setOf(
-//                Field(0, 2),
-                Field(1, 2),
-                Field(2, 2)
+                Field(0, 3),
+                Field(2, 3)
             ),
-            pawn.moves(Field(1, 1), board)
+            pawn.moves(Field(1, 2), board)
         )
     }
 }

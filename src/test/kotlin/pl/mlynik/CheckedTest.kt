@@ -60,4 +60,13 @@ class CheckedTest {
 
         assertEquals(boardCopy, board)
     }
+
+    @Test
+    fun check_mate() {
+        val board = Board
+            .with(King(Player.White), Field(3, 0))
+            .with(Knight(Player.Black), Field(3, 4))
+            .with(Pawn(Player.White), Field(3, 1))
+            .build()
+    }
 }

@@ -75,28 +75,28 @@ class Board {
 
     sealed class MoveResult {
         class ValidMove(val attacked: Piece?, val checked: Player?) : MoveResult()
+        class IllegalMove(val piece: Piece) : Board.MoveResult()
+        class OutOfTurn(val playerInTurn: Player) : MoveResult()
+        class OutOfBounds(val field: Field) : MoveResult()
         object StillInCheck : MoveResult()
 
-        object IllegalMove : Board.MoveResult()
-        object OutOfTurn : MoveResult()
-        object OutOfBounds : MoveResult()
         object EmptySpace : MoveResult()
     }
 
     fun move(fromField: Field, toField: Field): MoveResult {
-        if (!toField.isValid()) return MoveResult.OutOfBounds
-        if (!fromField.isValid()) return MoveResult.OutOfBounds
+        if (!toField.isValid()) return MoveResult.OutOfBounds(toField)
+        if (!fromField.isValid()) return MoveResult.OutOfBounds(fromField)
 
         val moving = fields[fromField] ?: return MoveResult.EmptySpace
 
         if (moving.player != player) {
-            return MoveResult.OutOfTurn
+            return MoveResult.OutOfTurn(player)
         }
 
         val movesAllowed = moving.moves(fromField, this)
         val movedTo = fields[toField]
         if (!movesAllowed.contains(toField)) {
-            return MoveResult.IllegalMove
+            return MoveResult.IllegalMove(moving)
         }
 
         fun validMove(checked: Player?) =
