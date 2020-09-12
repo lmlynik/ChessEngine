@@ -38,12 +38,15 @@ class Pawn(player: Player) : Piece(player, 'p') {
             list.add(upwards)
         }
 
-        val upwards2 = when (player) {
-            Player.White -> if (field.y == 1) upwards + Rank.Up else null
-            Player.Black -> if (field.y == 6) upwards + Rank.Down else null
-        }
+        if(list.isNotEmpty()) {
 
-        upwards2?.let { list.add(it) }
+            val upwards2 = when (player) {
+                Player.White -> if (field.y == 1) upwards + Rank.Up else null
+                Player.Black -> if (field.y == 6) upwards + Rank.Down else null
+            }
+
+            upwards2?.let { list.add(it) }
+        }
 
         fun directed(direction: Direction) {
             val r = board.at(upwards + direction)

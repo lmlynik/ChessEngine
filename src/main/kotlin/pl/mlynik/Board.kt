@@ -111,12 +111,13 @@ class Board {
         draftFields[fromField] = null
         draftFields[toField] = moving
 
-        val stillCheck = stillCheck(draftFields)
-        if (stillCheck) {
-            return MoveResult.StillInCheck
+        if (checked == null) {
+            checked = if (testChecked(player.opponent, draftFields)) player.opponent else null
+        } else {
+            if (testChecked(player, draftFields)) {
+                return MoveResult.StillInCheck
+            }
         }
-
-        checked = checked(player, moving, toField)
 
         val r = validMove(checked)
 
@@ -126,36 +127,25 @@ class Board {
         return r
     }
 
-    private fun stillCheck(draftFields: MutableMap<Field, Piece?>): Boolean {
-        val playerKingPosition = draftFields
+    private fun testChecked(player: Player, fields: MutableMap<Field, Piece?>): Boolean {
+        val playerKingPosition = fields
             .entries
             .firstOrNull { it.value == King(player) }
             ?.key
             ?: return false
 
-        val www = draftFields
+        val www = fields
             .filter { it.value?.player == player.opponent }
-            .mapNotNull { it.value?.moves(it.key, this) }
+            .mapNotNull { it.value?.moves(it.key, this.copy(fields)) }
 
         return www.any { it.contains(playerKingPosition) }
     }
 
-    private fun checked(attacking: Player, moving: Piece, toField: Field): Player? {
-        val opponent = attacking.opponent
-        val moves = moving.moves(toField, this).filter { at(it) == AtResult.Occupied(King(opponent)) }
-
-        return if (moves.isNotEmpty()) {
-            opponent
-        } else {
-            null
-        }
-    }
-
-    fun copy(): Board {
+    fun copy(appliedFields: MutableMap<Field, Piece?> = fields.toMutableMap()): Board {
         val board = Board()
         board.player = player
         board.checked = checked
-        board.fields = fields.toMutableMap()
+        board.fields = appliedFields
         return board
     }
 
@@ -181,12 +171,13 @@ class Board {
     }
 
     companion object {
+        @JvmStatic
         fun empty(): Board {
             return Board()
         }
 
         fun with(field: Field, value: Piece): Board {
-            val board = Board()
+            val board = empty()
             board.fields[field] = value
             return board
         }

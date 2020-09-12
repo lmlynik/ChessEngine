@@ -15,6 +15,15 @@ class PawnTest {
     }
 
     @Test
+    fun white_cannot_go_up_and_2_squares_off_start() {
+        val pawn = Pawn(Player.White)
+        assertEquals(
+            setOf(Field(1, 3)),
+            pawn.moves(Field(1, 2), Board.empty())
+        )
+    }
+
+    @Test
     fun black_can_go_down() {
         val pawn = Pawn(Player.Black)
         assertEquals(

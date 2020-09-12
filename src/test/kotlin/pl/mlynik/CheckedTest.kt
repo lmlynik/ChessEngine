@@ -24,7 +24,33 @@ class CheckedTest {
         val result = board.move(Field(3, 4), Field(2, 2))
 
         if (result is Board.MoveResult.ValidMove) {
-            assertSame(Player.White, (result as Board.MoveResult.ValidMove).checked)
+            assertSame(Player.White, result.checked)
+        } else {
+            fail("Expected Checked ${Player.White}, but found $result")
+        }
+
+        assertSame(Player.White, board.checked)
+        assertSame(board.checked, board.player)
+    }
+
+    @Test
+    fun checked_by_uncovering_other() {
+        val board = Board
+            .with(King(Player.White), Field(3, 0))
+            .with(Knight(Player.Black), Field(3, 4))
+            .with(Queen(Player.Black), Field(3, 6))
+            .build()
+
+        assertSame(Player.White, board.player)
+
+        board.move(Field(3, 0), Field(3, 1))
+
+        assertSame(Player.Black, board.player)
+
+        val result = board.move(Field(3, 4), Field(1, 5))
+
+        if (result is Board.MoveResult.ValidMove) {
+            assertSame(Player.White, result.checked)
         } else {
             fail("Expected Checked ${Player.White}, but found $result")
         }
@@ -59,14 +85,5 @@ class CheckedTest {
         assert(result is Board.MoveResult.StillInCheck)
 
         assertEquals(boardCopy, board)
-    }
-
-    @Test
-    fun check_mate() {
-        val board = Board
-            .with(King(Player.White), Field(3, 0))
-            .with(Knight(Player.Black), Field(3, 4))
-            .with(Pawn(Player.White), Field(3, 1))
-            .build()
     }
 }

@@ -7,7 +7,7 @@ import org.junit.jupiter.api.assertAll
 class BoardTest {
 
     @Test
-    fun field_is_vaLid() {
+    fun field_is_valid() {
         assertAll(
             { assertTrue(Field(0, 0).isValid()) },
             { assertFalse(Field(0, -1).isValid()) },
@@ -36,9 +36,11 @@ class BoardTest {
             .filledWith { pawn }
             .build()
 
+        assertSame(Player.White, board.player)
         val moveResult = board.move(Field(1, 1), Field(1, 2))
 
         assert(moveResult is Board.MoveResult.IllegalMove)
+        assertSame(Player.White, board.player)
     }
 
     @Test
@@ -50,8 +52,10 @@ class BoardTest {
             .filledWith { pawn }
             .build()
 
+
         val moveResult = board.move(Field(1, 1), Field(1, 2))
 
         assert(moveResult is Board.MoveResult.OutOfTurn)
+
     }
 }
