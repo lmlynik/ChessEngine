@@ -52,10 +52,8 @@ class BoardTest {
             .filledWith { pawn }
             .build()
 
-
         val moveResult = board.move(Field(1, 1), Field(1, 2))
 
         assert(moveResult is Board.MoveResult.OutOfTurn)
-
     }
 }

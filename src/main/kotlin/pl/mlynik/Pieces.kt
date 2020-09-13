@@ -38,7 +38,7 @@ class Pawn(player: Player) : Piece(player, 'p') {
             list.add(upwards)
         }
 
-        if(list.isNotEmpty()) {
+        if (list.isNotEmpty()) {
 
             val upwards2 = when (player) {
                 Player.White -> if (field.y == 1) upwards + Rank.Up else null
